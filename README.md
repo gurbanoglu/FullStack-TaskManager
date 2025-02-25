@@ -11,3 +11,6 @@ cd FullStack/TaskManager/node-rest-api
 Execute the following to launch the local
 development server:
 node app.js
+
+Build command for both client-side and server-side:
+npm i
