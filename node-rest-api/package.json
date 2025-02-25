@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node app.js",
+    "rebuild": "electron-rebuild -f -w better-sqlit3"
   },
   "author": "",
   "license": "ISC",
@@ -14,5 +15,8 @@
     "better-sqlite3": "^11.7.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^3.2.9"
   }
 }
