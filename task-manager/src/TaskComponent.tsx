@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, SubmitHandler, Controller, useFormContext } from 'react-hook-form';
 import { BsPencilSquare } from "react-icons/bs";
 import { IoCheckmark } from "react-icons/io5";
 import { MdDeleteOutline } from "react-icons/md";
@@ -61,14 +61,15 @@ const AddTaskForm = (
     onSubmit: SubmitHandler<Task>
   }
 ) => {
-  // const [dueDate, setDueDate] = useState(new Date());
   const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs(new Date()));
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
+    control,
+    setValue
   } = useForm<Task>({
     /* If "defaultValues" is truthy, assign
        it to the defaultValues attribute. */
@@ -84,17 +85,45 @@ const AddTaskForm = (
     }
   });
 
-  const handleClick: SubmitHandler<Task> = (inputtedData: Task) => {
-    // If a new task is being created.
+  const handleClick: SubmitHandler<Task> = (inputtedTask: Task) => {
+    /* If a new task is being created.
+
+      "task" is a parameter to the
+      AddTaskForm functional component. */
     if(task === undefined) {
       reset();
     }
 
-    console.log('inputtedData:', inputtedData);
+    // console.log('inputtedData.dueDate:', inputtedTask.dueDate);
+
+    let inputtedDate: Date = new Date(inputtedTask.dueDate);
+
+    /* Months are 0-based, so add 1 to the return value of
+       getMonth().
+
+       The padStart() method of String values pads the string
+       with another string (multiple times, if needed) until
+       the resulting string reaches the given length. 
+       
+       This is necessary for months that have a single digit
+       for their numerical representation. */
+
+    let dateStr: string = inputtedDate.getHours().toString() + ':' +
+                          inputtedDate.getMinutes().toString() + ', ' +
+                          inputtedDate.getDate().toString() + '/' +
+                          (inputtedDate.getMonth() + 1).toString()
+                          .padStart(2, '0') + '/' +
+                          inputtedDate.getFullYear().toString();
+
+    console.log('dateStr:', dateStr);
+
+    inputtedTask.dueDate = dateStr;
 
     /* onSubmit will either be assigned
        onCreateSubmit or onEditSubmit. */
-    onSubmit(inputtedData);
+    onSubmit(inputtedTask);
+
+    setDueDate(dayjs(new Date()));
   };
 
   return (
@@ -124,20 +153,32 @@ const AddTaskForm = (
 
       <label>Due Date</label>
 
-      <div>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            {...register('dueDate', 
-              { required: 'You must input a due date for the task.' })}
-            value={dueDate}
-            closeOnSelect={false}
-            onChange={(date) => setDueDate(date!)}
-            minDateTime={dayjs().set('hour', new Date().getHours()).startOf('hour')
-              .set('minute', new Date().getMinutes()).startOf('minute')}
-            sx={{ width: 1 }}
-          />
-        </LocalizationProvider>
-      </div>
+      {/* <div> */}
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Controller
+          name="dueDate"
+          control={control}
+          render={({ field: { onChange } }) => (
+            <DateTimePicker
+              {...register('dueDate',
+                { required: 'You must input a due date for the task.' })}
+              value={dueDate}
+              // Send value to the hook form.
+              onChange={(event) => {
+                // console.log("event?.format():", event?.format())
+
+                if (event != null) {
+                  setValue('dueDate', event.format())
+                }
+              }}
+              minDateTime={dayjs().set('hour', new Date().getHours()).startOf('hour')
+                .set('minute', new Date().getMinutes()).startOf('minute')}
+              sx={{ width: 1 }}
+            />
+          )}
+        />
+      </LocalizationProvider>
+      {/* </div> */}
 
       {errors.dueDate && <p role="alert">{errors.dueDate.message}</p>}
 
