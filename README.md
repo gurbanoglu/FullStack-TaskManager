@@ -12,5 +12,6 @@ Execute the following to launch the local
 development server:
 node app.js
 
-Build command for both client-side and server-side:
+Build command to run in the client-side and
+server-side directories:
 npm i
