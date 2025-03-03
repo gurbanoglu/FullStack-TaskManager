@@ -97,6 +97,13 @@ const AddTaskForm = (
     if(inputtedTask.dueDate.length == 25) {
       let inputtedDate: Date = new Date(inputtedTask.dueDate);
 
+      const daysOfTheWeek = [
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday"
+      ];
+
+      let dayOfTheWeek: string = daysOfTheWeek[inputtedDate.getDay() - 1];
+
       /* Months are 0-based, so add 1 to the return value of
         getMonth().
 
@@ -110,7 +117,8 @@ const AddTaskForm = (
 
       let dateStr: string = inputtedDate.getHours().toString() + ':' +
       inputtedDate.getMinutes().toString().padStart(2, '0') + ', ' +
-      inputtedDate.getDate().toString() + '/' +
+      dayOfTheWeek + ', ' +
+      inputtedDate.getDate().toString().padStart(2, '0') + '/' +
       (inputtedDate.getMonth() + 1).toString()
       .padStart(2, '0') + '/' +
       inputtedDate.getFullYear().toString();
