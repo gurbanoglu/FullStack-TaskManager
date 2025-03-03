@@ -29,3 +29,12 @@ is generated.
 Remember not to push the node-rest-api/.env file to
 the GitHub repository because environment variables
 store confidential/sensitive data.
+
+I noticed that even after successfully deploying the
+backend Express application, the link to access it
+shows:
+Cannot GET /
+GET https://taskmanager-ar4b.onrender.com/ 404 (Not Found)
+
+Objectives:
+Impede end users from inputting identical task titles.
