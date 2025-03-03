@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useForm, SubmitHandler, Controller, useFormContext } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { BsPencilSquare } from "react-icons/bs";
 import { IoCheckmark } from "react-icons/io5";
 import { MdDeleteOutline } from "react-icons/md";
@@ -153,12 +153,11 @@ const AddTaskForm = (
 
       <label>Due Date</label>
 
-      {/* <div> */}
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Controller
           name="dueDate"
           control={control}
-          render={({ field: { onChange } }) => (
+          render={() => (
             <DateTimePicker
               {...register('dueDate',
                 { required: 'You must input a due date for the task.' })}
@@ -178,7 +177,6 @@ const AddTaskForm = (
           )}
         />
       </LocalizationProvider>
-      {/* </div> */}
 
       {errors.dueDate && <p role="alert">{errors.dueDate.message}</p>}
 
