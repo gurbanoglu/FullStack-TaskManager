@@ -100,15 +100,16 @@ const AddTaskForm = (
       /* Months are 0-based, so add 1 to the return value of
         getMonth().
 
-        The padStart() method of String values pads the string
-        with another string (multiple times, if needed) until
-        the resulting string reaches the given length. 
-        
+        The padStart(given_length, character_to_pad_string_with)
+        method of String values pads the string with another
+        string (multiple times, if needed) until the resulting
+        string reaches the given length.
+
         This is necessary for months that have a single digit
         for their numerical representation. */
 
       let dateStr: string = inputtedDate.getHours().toString() + ':' +
-      inputtedDate.getMinutes().toString() + ', ' +
+      inputtedDate.getMinutes().toString().padStart(2, '0') + ', ' +
       inputtedDate.getDate().toString() + '/' +
       (inputtedDate.getMonth() + 1).toString()
       .padStart(2, '0') + '/' +
