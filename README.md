@@ -15,3 +15,13 @@ node app.js
 Build command to run in the client-side and
 server-side directories:
 npm i
+
+Delete the node_modules directory in both the
+ReactJS and Express projects before deploying
+each of them to Render.
+
+For the "Build Command" input field in the Render
+configuration settings, put "dist" (without the quotes)
+because when executing the command "npm run build"
+in the "task-manager" directory, the "dist" folder
+is generated.
