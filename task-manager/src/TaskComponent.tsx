@@ -94,30 +94,28 @@ const AddTaskForm = (
       reset();
     }
 
-    // console.log('inputtedData.dueDate:', inputtedTask.dueDate);
+    if(inputtedTask.dueDate.length == 25) {
+      let inputtedDate: Date = new Date(inputtedTask.dueDate);
 
-    let inputtedDate: Date = new Date(inputtedTask.dueDate);
+      /* Months are 0-based, so add 1 to the return value of
+        getMonth().
 
-    /* Months are 0-based, so add 1 to the return value of
-       getMonth().
+        The padStart() method of String values pads the string
+        with another string (multiple times, if needed) until
+        the resulting string reaches the given length. 
+        
+        This is necessary for months that have a single digit
+        for their numerical representation. */
 
-       The padStart() method of String values pads the string
-       with another string (multiple times, if needed) until
-       the resulting string reaches the given length. 
-       
-       This is necessary for months that have a single digit
-       for their numerical representation. */
+      let dateStr: string = inputtedDate.getHours().toString() + ':' +
+      inputtedDate.getMinutes().toString() + ', ' +
+      inputtedDate.getDate().toString() + '/' +
+      (inputtedDate.getMonth() + 1).toString()
+      .padStart(2, '0') + '/' +
+      inputtedDate.getFullYear().toString();
 
-    let dateStr: string = inputtedDate.getHours().toString() + ':' +
-                          inputtedDate.getMinutes().toString() + ', ' +
-                          inputtedDate.getDate().toString() + '/' +
-                          (inputtedDate.getMonth() + 1).toString()
-                          .padStart(2, '0') + '/' +
-                          inputtedDate.getFullYear().toString();
-
-    console.log('dateStr:', dateStr);
-
-    inputtedTask.dueDate = dateStr;
+      inputtedTask.dueDate = dateStr;
+    }
 
     /* onSubmit will either be assigned
        onCreateSubmit or onEditSubmit. */
@@ -164,8 +162,6 @@ const AddTaskForm = (
               value={dueDate}
               // Send value to the hook form.
               onChange={(event) => {
-                // console.log("event?.format():", event?.format())
-
                 if (event != null) {
                   setValue('dueDate', event.format())
                 }
@@ -284,6 +280,8 @@ export const TaskComponent = () => {
   };
 
   const onEditSubmit: SubmitHandler<Task> = (inputtedData: Task) => {
+    console.log(`inputtedData: ${inputtedData}`)
+
     saveEdit.mutate(
       {
         id: inputtedData.id,
