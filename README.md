@@ -25,3 +25,7 @@ configuration settings, put "dist" (without the quotes)
 because when executing the command "npm run build"
 in the "task-manager" directory, the "dist" folder
 is generated.
+
+Remember not to push the node-rest-api/.env file to
+the GitHub repository because environment variables
+store confidential/sensitive data.
