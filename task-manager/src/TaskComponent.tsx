@@ -16,6 +16,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from 'dayjs';
+import Modal from './Modal';
 
 export type Task = {
   id: string
@@ -27,7 +28,7 @@ export type Task = {
 
 export type newTask = Omit<Task, 'id'>;
 
-const StyledDiv = styled.div<{
+const StyledBtnDiv = styled.div<{
   $task: Task
 }>`
   display: flex;
@@ -42,7 +43,7 @@ const StyledDiv = styled.div<{
   }
 `;
 
-const StyledParagraph = styled.p<{
+const StyledTaskDiv = styled.div<{
   $task: Task
 }>`
   text-decoration: ${ props =>
@@ -86,11 +87,14 @@ const AddTaskForm = (
   });
 
   const handleClick: SubmitHandler<Task> = (inputtedTask: Task) => {
+
+
     /* If a new task is being created.
 
       "task" is a parameter to the
       AddTaskForm functional component. */
     if(task === undefined) {
+      // Clear the input form.
       reset();
     }
 
@@ -178,6 +182,9 @@ const AddTaskForm = (
               minDateTime={dayjs().set('hour', new Date().getHours()).startOf('hour')
                 .set('minute', new Date().getMinutes()).startOf('minute')}
               sx={{ width: 1 }}
+              // Prevent the modal from closing
+              // when select "AM" or "PM".
+              closeOnSelect={false}
             />
           )}
         />
@@ -187,13 +194,13 @@ const AddTaskForm = (
 
       <div className="center">
         {task !== null ?
-          <StyledDiv $task={task!}>
+          <StyledBtnDiv $task={task!}>
             <button
               type='submit'>
               <BsPencilSquare />
               Save Task
             </button>
-          </StyledDiv>
+          </StyledBtnDiv>
           :
           <button type="submit">Add Task</button>
         }
@@ -204,19 +211,22 @@ const AddTaskForm = (
 
 export const TaskComponent = () => {
   const [idOfTaskToEdit, setIdOfTaskToEdit] = useState('-1');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
+  // On launch.
   const { isPending, isSuccess, isError, data, error } = useQuery({
     queryKey: ['task-component'],
     queryFn: getTasks
   })
 
   if (isPending) {
-    console.log('Pending...');
+    // console.log('Pending...');
   }
 
   if(isSuccess) {
-    console.log('The query was successful and data is available.');
-    console.log(`data?.tasks: ${JSON.stringify(data?.tasks, null, 2)}`);
+    // console.log('The query was successful and data is available.');
+
+    // console.log(`data.tasks: ${JSON.stringify(data.tasks, null, 2)}`);
   }
 
   if (isError) {
@@ -230,12 +240,16 @@ export const TaskComponent = () => {
     mutationFn: createTask,
     onSuccess: () => {
       // Invalidate and refetch
-      /*Invalidating queries is performed
-        rather than setting state.*/
+      /* Invalidating queries is performed
+         rather than setting state. */
       queryClient.invalidateQueries({ queryKey: ['task-component'] })
     },
-    onError: () => {
-      console.log("Error occured while invoking mutation.")
+    onError: (error) => {
+      console.log(`In addTask onError callback:\n${error.message}`);
+
+      if(error.message == 'Server error: Inputted title is a duplicate.') {
+        setModalIsOpen(true);
+      }
     }
   });
 
@@ -244,12 +258,12 @@ export const TaskComponent = () => {
     mutationFn: markTaskComplete,
     onSuccess: () => {
       // Invalidate and refetch
-      /*Invalidating queries is performed
-        rather than setting state.*/
+      /* Invalidating queries is performed
+         rather than setting state. */
       queryClient.invalidateQueries({ queryKey: ['task-component'] })
     },
     onError: () => {
-      console.log("Error occured while invoking mutation.")
+      console.log("Error occured while marking as complete.")
     }
   });
 
@@ -258,12 +272,12 @@ export const TaskComponent = () => {
     mutationFn: updateTask,
     onSuccess: () => {
       // Invalidate and refetch
-      /*Invalidating queries is performed
-        rather than setting state.*/
+      /* Invalidating queries is performed
+         rather than setting state. */
       queryClient.invalidateQueries({ queryKey: ['task-component'] })
     },
     onError: () => {
-      console.log("Error occured while invoking mutation.")
+      console.log("Error occured while updating task.")
     }
   });
 
@@ -273,7 +287,7 @@ export const TaskComponent = () => {
       queryClient.invalidateQueries({ queryKey: ['task-component'] })
     },
     onError: () => {
-      console.log("Error occured while invoking mutation.")
+      console.log("Error occured while deleting task.")
     }
   });
 
@@ -289,8 +303,6 @@ export const TaskComponent = () => {
   };
 
   const onEditSubmit: SubmitHandler<Task> = (inputtedData: Task) => {
-    console.log(`inputtedData: ${inputtedData}`)
-
     saveEdit.mutate(
       {
         id: inputtedData.id,
@@ -336,13 +348,19 @@ export const TaskComponent = () => {
                     <div className="task-item-row">
                       <div className="column">
                         <div className="task-item-row">
-                          <StyledParagraph $task={task}>{task.title}</StyledParagraph>
+                          <StyledTaskDiv $task={task}>
+                            <h3>{task.title}</h3>
+                          </StyledTaskDiv>
                         </div>
                         <div className="task-item-row">
-                          <StyledParagraph $task={task}>Due date: {task.dueDate}</StyledParagraph>
+                          <StyledTaskDiv $task={task}>
+                            {task.description}
+                          </StyledTaskDiv>
                         </div>
                         <div className="task-item-row">
-                          <StyledParagraph $task={task}>{task.description}</StyledParagraph>
+                          <StyledTaskDiv $task={task}>
+                            Due date: {task.dueDate}
+                          </StyledTaskDiv>
                         </div>
                       </div>
                     </div>
@@ -374,6 +392,12 @@ export const TaskComponent = () => {
           </div>
         </div>
       }
+
+      <Modal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}>
+        <h2>Modal Content</h2>
+        <p>The title you inputted was already given to another task.
+           Please enter a unique title.</p>
+      </Modal>
     </div>
   );
 };

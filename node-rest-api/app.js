@@ -2,8 +2,8 @@ import express from 'express';
 import { db } from './database.js';
 import bodyParser from 'body-parser';
 
-/*Restart the local development server
-  after making changes.*/
+/* Restart the local development server
+   after making changes. */
 
 // To access environment variables in the .env file.
 import 'dotenv/config';
@@ -11,12 +11,12 @@ import 'dotenv/config';
 // Generate a server.
 const app = express();
 
-/*Assume the data being sent to the server is
-  JSON and use bodyParser to read and convert
-  the JSON string into a JavaScript object.*/
+/* Assume the data being sent to the server is
+   JSON and use bodyParser to read and convert
+   the JSON string into a JavaScript object. */
 app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2000;
 
 app.listen(PORT, (err) => {
   if (err) {
@@ -26,10 +26,10 @@ app.listen(PORT, (err) => {
   console.log(`Server listening on port ${PORT}.`);
 });
 
-app.get('/get-tasks', (request, response) => {
+app.get('/get-tasks', (req, res) => {
   console.log('/get-tasks');
 
-  response.set('content-type', 'application/json');
+  res.set('content-type', 'application/json');
 
   let data = {tasks: []};
 
@@ -43,27 +43,76 @@ app.get('/get-tasks', (request, response) => {
     }
 
     let content = JSON.stringify(data);
-    response.send(content);
+    res.send(content);
   }catch(err) {
-    /*Catch the error, so that the
-      application doesn't crash.*/
+    /* Catch the error, so that the
+       application doesn't crash. */
     console.log(err.message);
 
     // Indicates a problem with the data.
-    response.status(467);
+    res.status(467);
 
-    response.send(`{"code":467, "status":"${err.message}"}`);
+    res.send(`{"code":467, "status":"${err.message}"}`);
   }
 });
 
-app.post('/create-task', (req, res) => {
-  console.log('/create-task');
+/* Verify whether the inputted title for the task
+   already exists in one of the records/rows in
+   the database table. */
+const inputtedTitleIsDuplicate = async (inputtedTitle) => {
+  try {
+    const stmt = db.prepare(`
+      SELECT CASE
+        WHEN EXISTS (
+          SELECT 1
+          FROM tasks
+          WHERE title=?
+        ) THEN TRUE
+        ELSE FALSE
+      END AS Result`
+    );
 
-  // console.log(req.body);
+    /* Use stmt.get() when you want to retrieve data
+       from a SELECT query.
+
+       stmt.run() is typically used for INSERT, UPDATE,
+       or DELETE operations where you don't need to
+       retrieve data. */
+    const info = stmt.get(inputtedTitle);
+
+    return info["Result"];
+  } catch (err) {
+    // Re-throw the error to handle it in the route.
+    throw err;
+
+    /* Catch the error, so that the
+       application doesn't crash. */
+    // console.log(err.message);
+
+    // Indicates a problem with the data.
+    // res.status(468);
+
+    // res.send(`{"code":468, "status":"${err.message}"}`);
+  }
+};
+
+app.post('/create-task', async (req, res) => {
+  console.log('/create-task');
 
   res.set('content-type', 'application/json');
 
+  // if(inputtedTitleIsDuplicate(req.body.title, res)) {
+  //   res.send('Inputted title is a duplicate.');
+  // }
+
   try {
+    const isDuplicate = await inputtedTitleIsDuplicate(req.body.title);
+
+    if (isDuplicate) {
+      res.status(409).send({ error: "Inputted title is a duplicate." });
+      return;
+    }
+
     const stmt = db.prepare('INSERT INTO tasks(title, description, dueDate, isComplete) VALUES (?, ?, ?, ?)');
 
     const info = stmt.run(req.body.title, req.body.description, req.body.dueDate, req.body.isComplete);
@@ -81,9 +130,7 @@ app.post('/create-task', (req, res) => {
   }catch(err) {
     console.log(err.message);
 
-    res.status(468);
-
-    res.send(`{"code":468, "status":"${err.message}"}`);
+    res.status(500).send({ error: "Internal Server Error" });
   }
 });
 

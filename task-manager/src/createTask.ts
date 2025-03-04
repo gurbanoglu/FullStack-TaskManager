@@ -21,13 +21,13 @@ export const createTask = async ( newTask: newTask ) => {
     console.log("data: ", data);
 
     if(!response.ok) {
-      // The server has sent back a description of the error.
-      console.log(data.description);
-      return;
+      // The server sent back a description of the error.
+      throw new Error(`Server error: ${data.error}`);
     }
 
     return data;
   } catch(error) {
-    console.log(error);
+    // Throw the error to trigger the onError callback.
+    throw error;
   }
 };

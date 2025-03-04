@@ -71,10 +71,15 @@ h1 {
   max-width: 500px;
   background-color: white;
 
-  /*padding: top left-right bottom*/
+  /* padding: top left-right bottom */
   padding: 20px 0 0;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Necessary for the vertical scroll feature
+     that appears when there are more than two
+     tasks. */
+  height: 540.8px;
 }
 
 .control-wrapper {
@@ -86,10 +91,6 @@ h1 {
 .task-list-section {
   display: flex;
   width: 60%;
-
-  .control-wrapper {
-    overflow-y: auto;
-  }
 }
 
 .center {
@@ -145,6 +146,7 @@ button {
 ul {
   list-style-type: none;
   width: 100%;
+  overflow-y: auto;
 }
 
 li {

@@ -20,7 +20,7 @@ export const updateTask = async ( updatedTask: Task ) => {
     console.log("data: ", data);
 
     if(!response.ok) {
-      // The server has sent back a description of the error.
+      // The server sent back a description of the error.
       console.log(data.description);
       return;
     }

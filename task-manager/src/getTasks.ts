@@ -11,7 +11,7 @@ export const getTasks = async () => {
     const data = await response.json();
 
     if(!response.ok) {
-      // The server has sent back a description of the error.
+      // The server sent back a description of the error.
       console.log(data.description);
       return;
     }
