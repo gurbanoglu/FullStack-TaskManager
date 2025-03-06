@@ -1,0 +1,35 @@
+# Git will not track the files/folders
+# specified in this file.
+.env
+node_modules
+
+# The below files/folders were copied over from
+# the .gitignore that was in the ReactJS application.
+# Prepending them with ./task-manager/ is not necessary
+# because patterns in the .gitignore file are applied
+# recursively to the directory they are in and all its
+# subdirectories.
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
