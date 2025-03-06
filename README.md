@@ -16,6 +16,10 @@ Build command to run in the client-side and
 server-side directories:
 npm i
 
+Remember that Git pushes should only be executed
+in the "Task Manager" directory since that is
+where the Git repository was initialised.
+
 Delete the node_modules directory in both the
 ReactJS and Express projects before deploying
 each of them to Render.
